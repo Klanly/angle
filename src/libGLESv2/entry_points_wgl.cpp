@@ -248,7 +248,7 @@ BOOL GL_APIENTRY wglMakeCurrent(HDC hDc, HGLRC newContext)
 {
     Thread *thread        = egl::GetCurrentThread();
     egl::Display *display = egl::Display::GetExistingDisplayFromNativeDisplay(hDc);
-    const gl::Context *context = display->getContext(reinterpret_cast<gl::Context *>(newContext));
+    const gl::Context *context = reinterpret_cast<gl::Context *>(newContext);
 
     ScopedSyncCurrentContextFromThread scopedSyncCurrent(thread);
 
@@ -259,7 +259,7 @@ BOOL GL_APIENTRY wglMakeCurrent(HDC hDc, HGLRC newContext)
         if (oldContext)
         {
             ANGLE_EGL_TRY_RETURN(thread, oldContext->unMakeCurrent(display), "wglMakeCurrent",
-                                 display->getContext(oldContext), EGL_FALSE);
+                                 oldContext, EGL_FALSE);
             thread->setCurrent(nullptr);
         }
         return TRUE;
@@ -275,7 +275,7 @@ BOOL GL_APIENTRY wglMakeCurrent(HDC hDc, HGLRC newContext)
         ANGLE_EGL_TRY_RETURN(thread,
                              display->makeCurrent(thread, previousContext, surface, surface,
                                                   const_cast<gl::Context *>(context)),
-                             "wglMakeCurrent", display->getContext(context), EGL_FALSE);
+                             "wglMakeCurrent", context, EGL_FALSE);
     }
 
     return TRUE;
